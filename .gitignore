@@ -44,6 +44,7 @@ Thumbs.db
 .project
 .pydevproject
 *.pyc
+.idea/
 
 #Directories to ignore #
 #######################
