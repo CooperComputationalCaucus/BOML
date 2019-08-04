@@ -48,5 +48,6 @@ Thumbs.db
 
 #Directories to ignore #
 #######################
-test_data/
+test_data/*
+!test_data/organic_rgb/
 *.pdf
