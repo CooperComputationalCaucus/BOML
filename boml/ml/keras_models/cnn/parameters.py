@@ -115,9 +115,10 @@ def gen_hyperparameters(metaparams):
     params['beta_2'] = 1 - 10 ** metaparams['log_beta_2']
     hyperparams = _default_hyperparameters()
 
-    # Update single values like dropout rate, learning rate, and training parameters, etc
+    # Update single values like dropout rate, and training parameters, etc
     for key in metaparams:
-        if key in hyperparams: hyperparams[key] = metaparams[key]
+        if key in hyperparams:
+            hyperparams[key] = metaparams[key]
     hyperparams.update(params)
     # Enforce tuple
     hyperparams['data_shape'] = tuple(hyperparams['data_shape'])
