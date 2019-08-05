@@ -3,6 +3,7 @@
 Set of checks for configurations to catch obvious issues before they arise.
 """
 
+#TODO: Add checks for datashapes
 
 def general_checks(config):
     if config['init_random'] == 0 & config['previous_points']:
