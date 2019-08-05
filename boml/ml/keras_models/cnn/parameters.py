@@ -104,7 +104,7 @@ def gen_hyperparameters(metaparams):
         params['conv_kernels'].append(params['conv_kernels'][-1] * (2 ** metaparams['kernel_roc']))
         params['conv_strides'].append(params['conv_strides'][-1] * (2 ** metaparams['stride_roc']))
         params['pool_sizes'].append(params['pool_sizes'][-1] * (2 ** metaparams['pool_roc']))
-    # Ensure validity
+    # Ensure validity of integer lists
     valid = lambda x: max(1, round(x))
     for key in params:
         params[key] = list(map(int, (map(valid, params[key]))))
