@@ -2,7 +2,7 @@
 
 Adding a new model requires submodule in ml that contains:
 models.py
-{training}
+{change appopriate conditional statement in training.py}
 parameters.py
 {load_metaparameters, gen_hyperparameters}
 

@@ -21,7 +21,7 @@ from boml.ml.utils.data_proc import ListAddressesLabels, CategoricalDataGenerato
 from boml.ml.utils.callbacks import ClassificationMetrics, RegressionMetrics, GeneratorClassificationMetrics, \
     GeneratorRegressionMetrics
 
-
+### REQUIRES CHANGES FOR NEW MODEL TYPES ###
 def gen_model(params):
     if params['architecture'] == 'cnn':
         from .cnn.models import gen_model as gm
@@ -30,7 +30,7 @@ def gen_model(params):
     else:
         from .cnn.models import gen_model as gm
     return gm(params)
-
+### REQUIRES CHANGES FOR NEW MODEL TYPES ###
 
 def general_training(params):
     # FIXME: Stalls in model.fit_generator() with multiprocessing

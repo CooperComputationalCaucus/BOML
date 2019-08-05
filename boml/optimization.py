@@ -43,6 +43,7 @@ class Optimizer:
             training
 
         """
+        ### REQUIRES CHANGES FOR NEW MODEL TYPES ###
         if self.config['architecture'] == 'cnn':
             from boml.ml.keras_models.cnn import load_metaparameters, gen_hyperparameters
             from boml.ml.keras_models.training import training
@@ -68,6 +69,7 @@ class Optimizer:
             load_metaparameters = None
             gen_hyperparameters = None
             training = None
+        ### REQUIRES CHANGES FOR NEW MODEL TYPES ###
 
         model_functions = {'load_metaparameters': load_metaparameters,
                            'gen_hyperparameters': gen_hyperparameters,
@@ -183,5 +185,6 @@ def optimize_nets(config_file=None, config_dict=None):
 
 if __name__ == '__main__':
     import os
+
     os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
     optimize_nets()
