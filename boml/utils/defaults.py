@@ -43,7 +43,7 @@ def cnn_defaults(config):
 
 
 def cnn2_defaults(config):
-    return config
+    return cnn_defaults(config)
 
 
 def nn_defaults(config):
