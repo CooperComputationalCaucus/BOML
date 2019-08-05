@@ -25,8 +25,8 @@ from boml.ml.utils.callbacks import ClassificationMetrics, RegressionMetrics, Ge
 def gen_model(params):
     if params['architecture'] == 'cnn':
         from .cnn.models import gen_model as gm
-    # elif params['architecture'] == 'cnn2':
-    #     from .cnn2.models import gen_model as gm
+    elif params['architecture'] == 'cnn2':
+        from .cnn2.models import gen_model as gm
     else:
         from .cnn.models import gen_model as gm
     return gm(params)

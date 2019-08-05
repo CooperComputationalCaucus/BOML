@@ -47,9 +47,9 @@ class Optimizer:
         if self.config['architecture'] == 'cnn':
             from boml.ml.keras_models.cnn import load_metaparameters, gen_hyperparameters
             from boml.ml.keras_models.training import training
-        # elif self.config['architecture'] == 'cnn2':
-        #     from .ml.cnn2.parameters import load_metaparameters, gen_hyperparameters
-        #     from .ml.cnn2.models import training
+        elif self.config['architecture'] == 'cnn2':
+            from boml.ml.keras_models.cnn import load_metaparameters, gen_hyperparameters
+            from boml.ml.keras_models.training import training
         # elif self.config['architecture'][0:2] == 'nn':
         #     from .ml.nn.parameters import load_metaparameters, gen_hyperparameters
         #     from .ml.nn.models import training
