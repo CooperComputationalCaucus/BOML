@@ -104,14 +104,15 @@ def gen_hyperparameters(metaparams):
         params['conv_kernels'].append(params['conv_kernels'][-1] * (2 ** metaparams['kernel_roc']))
         params['conv_strides'].append(params['conv_strides'][-1] * (2 ** metaparams['stride_roc']))
         params['pool_sizes'].append(params['pool_sizes'][-1] * (2 ** metaparams['pool_roc']))
-    params['lr'] = 10 ** metaparams['log_lr']
-    params['beta_1'] = 1 - 10 ** metaparams['log_beta_1']
-    params['beta_2'] = 1 - 10 ** metaparams['log_beta_2']
     # Ensure validity
     valid = lambda x: max(1, round(x))
     for key in params:
         params[key] = list(map(int, (map(valid, params[key]))))
 
+    # Non integer params
+    params['lr'] = 10 ** metaparams['log_lr']
+    params['beta_1'] = 1 - 10 ** metaparams['log_beta_1']
+    params['beta_2'] = 1 - 10 ** metaparams['log_beta_2']
     hyperparams = _default_hyperparameters()
 
     # Update single values like dropout rate, learning rate, and training parameters, etc
