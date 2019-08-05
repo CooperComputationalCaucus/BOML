@@ -194,7 +194,7 @@ class CategoricalDataGenerator(Sequence):
             raise ValueError('Generator not equipped for {} data type'.format(self.data_fmt))      
         return X
 
-def load_regression_data(list_IDs, dataset_path, regression_target = 'default',dim=(2048,), feature_scaling=False,
+def load_regression_data(list_IDs, dataset_path, regression_target = 'default',dim=(2048,), target_normalization=False,
                     data_fmt='png', shuffle=True, preprocessing = default_preprocessing):
     #TODO: implement regression data generator
     '''
@@ -240,7 +240,7 @@ def load_regression_data(list_IDs, dataset_path, regression_target = 'default',d
     # Get y data
     fnames = [os.path.splitext(os.path.basename(ID))[0][:-4] for ID in list_IDs]
     y = df.loc[fnames][regression_target]
-    if feature_scaling: y = (y-np.min(y))/(np.max(y)-np.min(y))
+    if target_normalization: y = (y-np.min(y))/(np.max(y)-np.min(y))
     
     return X,y.values
         

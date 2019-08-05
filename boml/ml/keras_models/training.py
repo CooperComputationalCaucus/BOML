@@ -95,7 +95,7 @@ def general_training(params):
                           'shuffle': params['shuffle'],
                           'data_fmt': params['data_fmt'],
                           'regression_target': params['regression_target'],
-                          'feature_scaling': params['feature_scaling']
+                          'target_normalization': params['target_normalization']
                           }
             train_x, train_y = load_regression_data(list_IDs=addrs['train_addrs'],
                                                     dataset_path=params['regression_path'],
