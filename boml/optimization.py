@@ -64,6 +64,10 @@ class Optimizer:
         # elif self.config['architecture'] == 'gp':
         #     from .ml.shallow.parameters import load_metaparameters, gen_hyperparameters
         #     from .ml.shallow.models import training
+        else:
+            load_metaparameters = None
+            gen_hyperparameters = None
+            training = None
 
         model_functions = {'load_metaparameters': load_metaparameters,
                            'gen_hyperparameters': gen_hyperparameters,
