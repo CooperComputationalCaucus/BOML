@@ -17,6 +17,7 @@ def cnn_defaults(config):
                                  'batch_size': 8,
                                  'n_classes': 2,
                                  'data_shape': (32, 32, 3),
+                                 'data_fmt': 'png',
                                  'verbose': True,
                                  'use_generator': False
                                  }
@@ -35,6 +36,9 @@ def cnn_defaults(config):
                                 'nodes_roc': [-2.0, 0.0, 0.1],
                                 'dense_dropout': [0.0, 0.8, 0.001]
                                 }
+    config['fixed_space'] = {'log_lr': -3,
+                             'log_beta_1': -1,
+                             'log_beta_2': -3}
     return
 
 

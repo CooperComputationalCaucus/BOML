@@ -70,6 +70,9 @@ def load_metaparameters(param_dict=None):
         'nodes': 2300,
         'nodes_roc': -1.,
         'dense_dropout': 0.5,
+        'log_lr': -3,
+        'log_beta_1': -1,
+        'log_beta_2': -3
     }
     if param_dict: metaparams.update(param_dict)
     metaparams['conv_units'] = int(metaparams['conv_units'])
@@ -101,6 +104,9 @@ def gen_hyperparameters(metaparams):
         params['conv_kernels'].append(params['conv_kernels'][-1] * (2 ** metaparams['kernel_roc']))
         params['conv_strides'].append(params['conv_strides'][-1] * (2 ** metaparams['stride_roc']))
         params['pool_sizes'].append(params['pool_sizes'][-1] * (2 ** metaparams['pool_roc']))
+    params['lr'] = 10 ** metaparams['log_lr']
+    params['beta_1'] = 1 - 10 ** metaparams['log_beta_1']
+    params['beta_2'] = 1 - 10 ** metaparams['log_beta_2']
     # Ensure validity
     valid = lambda x: max(1, round(x))
     for key in params:
