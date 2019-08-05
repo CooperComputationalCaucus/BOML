@@ -51,4 +51,3 @@ Thumbs.db
 test_data/*
 !test_data/organic_rgb/
 *.pdf
-boml/ml/keras_models/nn/*
