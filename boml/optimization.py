@@ -49,7 +49,7 @@ class Optimizer:
             from boml.ml.keras_models.training import training
         elif self.config['architecture'] == 'cnn2':
             from boml.ml.keras_models.cnn import load_metaparameters, gen_hyperparameters
-            from boml.ml.keras_models.training import training
+            from boml.ml.keras_models.training import train
         # elif self.config['architecture'][0:2] == 'nn':
         #     from .ml.nn.parameters import load_metaparameters, gen_hyperparameters
         #     from .ml.nn.models import training
@@ -111,6 +111,7 @@ class Optimizer:
             meta_dict.update(next_point)
             meta_dict.update(config['fixed_space'])
             metaparams = self.load_metaparameters(meta_dict)
+            metaparams['architecture'] = config['architecture']
             metaparams.update(config['training_params'])
             params = self.gen_hyperparameters(metaparams)
             params['run_name'] = "{}_{:04d}".format(config['basename'], config['state'] + idx)
