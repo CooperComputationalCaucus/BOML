@@ -34,8 +34,6 @@ def gen_model(params):
 
 def general_training(params):
     # FIXME: Stalls in model.fit_generator() with multiprocessing
-    # FIXME: Ensure regression data is loaded differently/seperately
-    # TODO: Testing for regression problems
     # TODO: Regression generator implementation
     start_time = time.time()
     config_keras()
