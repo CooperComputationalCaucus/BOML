@@ -109,9 +109,14 @@ def general_training(params):
                   'beta_2': params['beta_2'],
                   'decay': params['decay']}
     _optimizer = optimizers.Adam(**opt_params)
-    model.compile(optimizer=_optimizer,
-                  loss='categorical_crossentropy',
-                  metrics=['accuracy'])
+    if params['classification']:
+        model.compile(optimizer=_optimizer,
+                      loss='categorical_crossentropy',
+                      metrics=['accuracy'])
+    else:
+        model.compile(optimizer=_optimizer,
+                      loss='mean_squared_error',
+                      metrics=['accuracy'])
 
     # Create callbacks dependent on generator use
     callbacks = []

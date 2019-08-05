@@ -238,7 +238,7 @@ def load_regression_data(list_IDs, dataset_path, regression_target = 'default',d
         raise ValueError('Generator not equipped for {} data type'.format(data_fmt))
     
     # Get y data
-    fnames = [os.path.splitext(os.path.basename(ID))[0][:-4] for ID in list_IDs]
+    fnames = [os.path.splitext(os.path.basename(ID))[0] for ID in list_IDs]
     y = df.loc[fnames][regression_target]
     if target_normalization: y = (y-np.min(y))/(np.max(y)-np.min(y))
     

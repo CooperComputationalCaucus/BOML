@@ -76,7 +76,7 @@ class GeneratorClassificationMetrics(Callback):
 class RegressionMetrics(Callback):
     # TODO: Paralelize
     def __init__(self):
-        super.__init__()
+        super().__init__()
         self.r2 = []
         self.mse = []
 

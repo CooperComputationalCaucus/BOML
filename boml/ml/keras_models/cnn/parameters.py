@@ -33,6 +33,10 @@ def _default_hyperparameters():
         'data_shape': (32, 32, 3),
         'data_fmt': 'png',
         'dataset_dir': '../test_data/organic_rgb/',
+        'regression_path': '../test_data/organic_rgb/cat0_random_Energy.csv',
+        'regression_target': 'Energy',
+        'target_normalization': False,
+
         # Variable model parameters
         'conv_units': 3,  # redundant, but useful
         'conv_filters': [80, 80, 80],
@@ -104,7 +108,7 @@ def gen_hyperparameters(metaparams):
 
     hyperparams = _default_hyperparameters()
 
-    # Update single values like dropout rate, learning rate, etc
+    # Update single values like dropout rate, learning rate, and training parameters, etc
     for key in metaparams:
         if key in hyperparams: hyperparams[key] = metaparams[key]
     hyperparams.update(params)
