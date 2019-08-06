@@ -59,9 +59,9 @@ class Optimizer:
         # elif self.config['architecture'] == 'nb':
         #     from .ml.shallow.parameters import load_metaparameters, gen_hyperparameters
         #     from .ml.shallow.models import training
-        # elif self.config['architecture'] == 'svm':
-        #     from .ml.shallow.parameters import load_metaparameters, gen_hyperparameters
-        #     from .ml.shallow.models import training
+        elif self.config['architecture'] == 'svm':
+            from boml.ml.sklearn_models.svm import load_metaparameters, gen_hyperparameters
+            from boml.ml.sklearn_models.training import training
         # elif self.config['architecture'] == 'gp':
         #     from .ml.shallow.parameters import load_metaparameters, gen_hyperparameters
         #     from .ml.shallow.models import training
