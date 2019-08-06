@@ -163,7 +163,7 @@ def general_training(params):
     with open(os.path.join(params['out_dir'], "{}_metrics.pickle".format(params['run_name'])), 'wb') as file_pi:
         pickle.dump(tracked_metrics, file_pi)
     if params['classification']:
-        training_results = {'val_loss': history.history['val_loss'][-1],
+        training_results = {'val_loss': -1* history.history['val_loss'][-1],
                             'val_acc': history.history['val_acc'][-1],
                             'val_f1': metrics.val_f1s[-1],
                             'val_recall': metrics.val_recalls[-1],
