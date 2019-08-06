@@ -27,6 +27,8 @@ def gen_model(params):
         from .cnn.models import gen_model as gm
     elif params['architecture'] == 'cnn2':
         from .cnn2.models import gen_model as gm
+    elif params['architecture'][:2] == 'nn':
+        from .nn.models import gen_model as gm
     else:
         from .cnn.models import gen_model as gm
     return gm(params)

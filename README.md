@@ -26,3 +26,7 @@ There should be a corresponding DataFrame pickle or csv file, with
 a column header of "Name" and column header of "XXX". <br>
 "Name": X value file name WITHOUT extension
 "XXX": Regression target, defaults to Energy
+
+### Requires updates on addition of new models
+boml.optmization.Optimizer.fetch_model_functions() <br>
+boml.ml.XXX_models.training.gen_model()
