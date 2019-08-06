@@ -190,7 +190,10 @@ def training(params):
                        'val_acc': 0.,
                        'val_f1': 0.,
                        'val_recall': 0.,
-                       'val_precision': 0.}
+                       'val_precision': 0.,
+                       'val_r2': 0.,
+                       'val_mse': 0.
+                       }
     try:
         return general_training(params)
     except ValueError as err:
