@@ -2,7 +2,6 @@
 @author: maffettone
 
 Quick test of SVM models
-#TODO: test regression
 """
 
 if __name__ == '__main__':
@@ -12,7 +11,7 @@ if __name__ == '__main__':
     from boml.optimization import optimize_nets
 
     config = {'verbose': 2,
-              'max_iter': 3,
+              'max_iter': 5,
               'max_time': 3600,
               'init_random': 2,
               'seed': None,
@@ -33,14 +32,14 @@ if __name__ == '__main__':
               'fixed_space': {
               },
               'training_params': {
-                  'val_split': 0.0,
+                  'cv': 5,
                   'dataset_dir': '../test_data/organic_rgb/',
                   'out_dir': '../test_data',
                   'run_name': 'test',
                   'batch_size': 8,
                   'data_shape': (3072,),
                   'data_fmt': 'png',
-                  'verbose': True
+                  'verbose': False
               }
               }
 
@@ -66,7 +65,7 @@ if __name__ == '__main__':
                   'fixed_space': {
                   },
                   'training_params': {
-                      'val_split': 0.0,
+                      'cv': 5,
                       'dataset_dir': '../test_data/organic_rgb/0/',
                       'regression_path': '../test_data/organic_rgb/cat0_random_Energy.csv',
                       'regression_target': 'Energy',

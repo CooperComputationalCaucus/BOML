@@ -112,6 +112,7 @@ class Optimizer:
             meta_dict.update(config['fixed_space'])
             metaparams = self.load_metaparameters(meta_dict)
             metaparams['architecture'] = config['architecture']
+            metaparams['multiprocessing'] = config['multiprocessing']
             metaparams.update(config['training_params'])
             params = self.gen_hyperparameters(metaparams)
             params['run_name'] = "{}_{:04d}".format(config['basename'], config['state'] + idx)
@@ -150,6 +151,7 @@ class Optimizer:
             if time.time() - self.start_time > config['max_time']:
                 print("Time limit exceeded!")
                 break
+
         return True
 
     def ending(self):

@@ -14,7 +14,7 @@ def _default_hyperparameters():
         'out_dir': '../test_data',
         'run_name': 'test',
         'cv': 5,
-        'n_jobs': 1,
+        'n_jobs': 0,
         'cv_threads': 1,
         'architecture': 'svm',
 
@@ -38,8 +38,7 @@ def load_metaparameters(param_dict=None):
     """
     Parameters for bayesian optimizer. Default dictionary listed and updated by param_dict.
     """
-    metaparams = {'n_jobs': 1,
-                  'architecture': 'svm',
+    metaparams = {'architecture': 'svm',
                   'log_gamma': -3,
                   'log_C': -2}
     if param_dict:
@@ -65,6 +64,14 @@ def gen_hyperparameters(metaparams):
         if key in hyperparams:
             hyperparams[key] = metaparams[key]
 
+    # Ensure types
+    hyperparams['cv'] = int( hyperparams['cv'])
+
+    # Multiprocessing for sklearn
+    if metaparams['multiprocessing']:
+        hyperparams['n_jobs'] = min(hyperparams['cv'],metaparams['multiprocessing'])
+    else:
+        hyperparams['n_jobs'] = 1
     return hyperparams
 
 

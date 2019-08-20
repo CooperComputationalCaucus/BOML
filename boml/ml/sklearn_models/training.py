@@ -7,10 +7,10 @@ import numpy as np
 import time
 import sys
 import traceback
+import gc
 
 from boml.ml.utils.mem_utils import check_dataset_memory
-from boml.ml.utils.data_proc import ListAddressesLabels, CategoricalDataGenerator, load_categorical_data, \
-    load_regression_data
+from boml.ml.utils.data_proc import ListAddressesLabels, load_categorical_data, load_regression_data
 
 
 ### REQUIRES CHANGES FOR NEW MODEL TYPES ###
@@ -23,7 +23,6 @@ def gen_model(params):
 ### REQUIRES CHANGES FOR NEW MODEL TYPES ###
 
 def metrics_dict(params):
-    # TODO: Add diff metrics for regression and classification
     if params['classification']:
         d = {'f1': make_scorer(f1_score, average='macro'),
              'acc': make_scorer(accuracy_score)
@@ -38,8 +37,6 @@ def metrics_dict(params):
 
 
 def general_training(params):
-    # TODO: Ensure memory clearing is efficient as implemented in utils.config_keras()
-    # TODO: Add model saving
     start_time = time.time()
 
     if 'seed' in params and params['seed']:
@@ -97,6 +94,13 @@ def general_training(params):
         print("Results:")
         for key in training_results:
             print("{} : {}".format(key, training_results[key]))
+
+    # Forced deletions
+    del x
+    del y
+    del scores
+    del estimator
+    gc.collect()
 
     return training_results
 

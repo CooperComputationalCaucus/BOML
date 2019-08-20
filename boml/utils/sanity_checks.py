@@ -3,7 +3,14 @@
 Set of checks for configurations to catch obvious issues before they arise.
 """
 import warnings
-#TODO: Add checks for datashapes (sklearn should be (m,))
+
+
+def custom_formatwarning(message, category, filename, lineno, *args, **kwargs):
+    return "{}:{}: {}: {} \n".format(filename, lineno, category, message)
+
+
+warnings.formatwarning = custom_formatwarning
+
 
 def general_checks(config):
     if config['init_random'] == 0 & config['previous_points']:
@@ -13,14 +20,34 @@ def general_checks(config):
     if config['regression'] & config['classification']:
         raise RuntimeError("Cannot simultaneously do regression and classification. Check configuration!")
 
-def sklearn_checks(config):
-    if len(config['data_shape']) != 1:
-        raise RuntimeError("sklearn models require an input data shape of (n,). Please ensure your data is 1-dimensional")
 
-    if config['training_params']['val_split'] > 0:
-        warnings.WarningMessage('Validation split set to {}; however, irrelevant for sklearn models. \n'
-                                'These models use cross-validation by default and split the data accordingly'.format(
-            config['training_params']['val_split']))
+def sklearn_checks(config):
+    if len(config['training_params']['data_shape']) != 1:
+        raise RuntimeError(
+            "sklearn models require an input data shape of (n,). Please ensure your data is 1-dimensional")
+
+    if 'val_split' in config['training_params']:
+        if 'cv' not in config['training_params'] or config['training_params']['cv']<1:
+            try:
+                config['training_params']['cv'] = int(1/config['training_params']['val_split'])
+            except ZeroDivisionError:
+                config['cv'] = 1
+            warnings.warn(
+                'Validation split set to {}; however, irrelevant for sklearn models. These models use cross-validation by '
+                'default and split the data accordingly.\n'
+                'Cross validation being set to {} splits'.format(
+                    config['training_params']['val_split'], config['training_params']['cv'])
+            )
+        else:
+            warnings.warn(
+                'Validation split set to {}; however, irrelevant for sklearn models. These models use cross-validation by '
+                'default and split the data accordingly.\n'
+                'Cross validation being set to {} splits'.format(
+                    config['training_params']['val_split'], config['training_params']['cv'])
+            )
+
+
+
 
 def cnn_checks(config):
     pass
@@ -44,6 +71,7 @@ def nb_checks(config):
 
 def svm_checks(config):
     sklearn_checks(config)
+
 
 def gp_checks(config):
     pass
