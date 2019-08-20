@@ -1,7 +1,7 @@
 """
 @author: maffettone
 
-SVM models for classification and regression
+Random forrest models for classification and regression
 """
 
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
