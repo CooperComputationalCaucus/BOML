@@ -53,14 +53,14 @@ class Optimizer:
         elif self.config['architecture'][0:2] == 'nn':
             from boml.ml.keras_models.nn import load_metaparameters, gen_hyperparameters
             from boml.ml.keras_models.training import training
-        # elif self.config['architecture'] == 'rf':
-        #     from .ml.shallow.parameters import load_metaparameters, gen_hyperparameters
-        #     from .ml.shallow.models import training
         # elif self.config['architecture'] == 'nb':
         #     from .ml.shallow.parameters import load_metaparameters, gen_hyperparameters
         #     from .ml.shallow.models import training
         elif self.config['architecture'] == 'svm':
             from boml.ml.sklearn_models.svm import load_metaparameters, gen_hyperparameters
+            from boml.ml.sklearn_models.training import training
+        elif self.config['architecture'] == 'rf':
+            from boml.ml.sklearn_models.rf import load_metaparameters, gen_hyperparameters
             from boml.ml.sklearn_models.training import training
         # elif self.config['architecture'] == 'gp':
         #     from .ml.shallow.parameters import load_metaparameters, gen_hyperparameters

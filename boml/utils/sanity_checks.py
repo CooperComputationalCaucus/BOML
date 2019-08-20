@@ -62,7 +62,7 @@ def nn_checks(config):
 
 
 def rf_checks(config):
-    pass
+    sklearn_checks(config)
 
 
 def nb_checks(config):

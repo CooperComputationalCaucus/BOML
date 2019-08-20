@@ -50,8 +50,26 @@ def nn_defaults(config):
     return config
 
 
+def sklearn_defaults(config):
+    config['training_params'] = {'cv': 5,
+                                 'dataset_dir': '../test_data/organic_rgb/0/',
+                                 'regression_path': '../test_data/organic_rgb/cat0_random_Energy.csv',
+                                 'regression_target': 'Energy',
+                                 'target_normalization': True,
+                                 'out_dir': '../test_data',
+                                 'run_name': 'test',
+                                 'data_shape': (3072,),
+                                 'data_fmt': 'png',
+                                 'verbose': True
+                                 }
+
+
 def rf_defaults(config):
-    return config
+    sklearn_defaults(config)
+    config['variable_space'] = {'log_n_estimators': [0, 3, 0.1],
+                                'min_samples_split': [2, 3, 1],
+                                'max_features': [0.1, 0.9, 0.001]}
+    return
 
 
 def nb_defaults(config):
@@ -59,7 +77,10 @@ def nb_defaults(config):
 
 
 def svm_defaults(config):
-    return config
+    sklearn_defaults(config)
+    config['variable_space'] = {'log_gamma': [-3, -2, 0.1],
+                                'log_C': [-3, -2, 0.1]}
+    return
 
 
 def gp_defaults(config):

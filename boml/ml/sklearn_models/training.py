@@ -17,6 +17,8 @@ from boml.ml.utils.data_proc import ListAddressesLabels, load_categorical_data, 
 def gen_model(params):
     if params['architecture'] == 'svm':
         from .svm.models import gen_model as gm
+    elif params['architecture'] == 'rf':
+        from .rf.models import gen_model as gm
     else:
         raise KeyError("Invalid architecture encountered in training.py")
     return gm(params)
