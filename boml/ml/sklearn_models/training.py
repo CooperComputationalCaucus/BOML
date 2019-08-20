@@ -19,6 +19,8 @@ def gen_model(params):
         from .svm.models import gen_model as gm
     elif params['architecture'] == 'rf':
         from .rf.models import gen_model as gm
+    elif params['architecture'] == 'gp':
+        from .gp.models import gen_model as gm
     else:
         raise KeyError("Invalid architecture encountered in training.py")
     return gm(params)

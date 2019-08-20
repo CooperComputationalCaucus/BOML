@@ -1,7 +1,7 @@
 """
 @author: maffettone
 
-Quick test of SVM models
+Quick test of gp models
 """
 
 if __name__ == '__main__':
@@ -24,11 +24,9 @@ if __name__ == '__main__':
               'feature_scaling': False,
               'regression': False,
               'classification': True,
-              'architecture': 'rf',
+              'architecture': 'gp',
               'variable_space': {
-                  'log_n_estimators': [0, 3, 0.1],
-                  'min_samples_split': [2, 3, 1],
-                  'max_features': [0.1, 0.9, 0.001]
+                  'log_length_scale': [-1, 0.5, 0.0001],
               },
               'fixed_space': {
               },
@@ -37,6 +35,7 @@ if __name__ == '__main__':
                   'dataset_dir': '../test_data/organic_rgb/',
                   'out_dir': '../test_data',
                   'run_name': 'test',
+                  'batch_size': 8,
                   'data_shape': (3072,),
                   'data_fmt': 'png',
                   'verbose': True
@@ -57,11 +56,9 @@ if __name__ == '__main__':
                   'feature_scaling': False,
                   'regression': True,
                   'classification': False,
-                  'architecture': 'rf',
+                  'architecture': 'gp',
                   'variable_space': {
-                      'log_n_estimators': [0, 3, 0.1],
-                      'min_samples_split': [2, 3, 1],
-                      'max_features': [0.1, 0.9, 0.001]
+                      'log_length_scale': [-1, 0.5, 0.0001],
                   },
                   'fixed_space': {
                   },
@@ -73,6 +70,7 @@ if __name__ == '__main__':
                       'target_normalization': True,
                       'out_dir': '../test_data',
                       'run_name': 'test',
+                      'batch_size': 8,
                       'data_shape': (3072,),
                       'data_fmt': 'png',
                       'verbose': True

@@ -84,7 +84,11 @@ def svm_defaults(config):
 
 
 def gp_defaults(config):
-    return config
+    sklearn_defaults(config)
+    config['variable_space'] = {'log_length_scale': [-1,0.5,0.001]}
+    config['fixed_space'] = {'nu': 2.5}
+
+    return
 
 
 def default_config(architecture=None):

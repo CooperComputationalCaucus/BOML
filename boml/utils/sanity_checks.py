@@ -74,7 +74,7 @@ def svm_checks(config):
 
 
 def gp_checks(config):
-    pass
+    sklearn_checks(config)
 
 
 def sanity_checks(config):

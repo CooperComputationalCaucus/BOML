@@ -62,9 +62,9 @@ class Optimizer:
         elif self.config['architecture'] == 'rf':
             from boml.ml.sklearn_models.rf import load_metaparameters, gen_hyperparameters
             from boml.ml.sklearn_models.training import training
-        # elif self.config['architecture'] == 'gp':
-        #     from .ml.shallow.parameters import load_metaparameters, gen_hyperparameters
-        #     from .ml.shallow.models import training
+        elif self.config['architecture'] == 'gp':
+            from boml.ml.sklearn_models.gp import load_metaparameters, gen_hyperparameters
+            from boml.ml.sklearn_models.training import training
         else:
             load_metaparameters = None
             gen_hyperparameters = None
