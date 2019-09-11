@@ -229,9 +229,6 @@ class BayesianOptimization(Observable):
         '''
         Develops inequality constraints ONLY. (>=0)
         '''
-        #TODO: write function to return scipy constraint dictionary for optimizer
-        #TODO: write options for equality constraints (incorporate in randomizer)
-        #TODO: write options for jacobian if needed?
         dicts = []
         funcs=[]
         for idx,constraint in enumerate(self.constraints):
@@ -256,6 +253,16 @@ class DiscreteBayesianOptimization(BayesianOptimization):
         self._pbounds = {item[0] :(item[1][:2]) for item in sorted(prange.items(), key=lambda x: x[0])}   
         super(DiscreteBayesianOptimization, self).__init__(f,self._pbounds,random_state,verbose,constraints,init_points)
         self._space = DiscreteSpace(f, prange, random_state, feature_scaling)
+
+        length_scale = list(self._space._steps)
+        kernel = Matern(length_scale=length_scale,
+                        length_scale_bounds=(1e-01, 1e4),
+                        nu=2.5)
+        self._gp = GaussianProcessRegressor(kernel=kernel,
+                                            alpha=1e-6,
+                                            normalize_y=False,
+                                            n_restarts_optimizer=10 * self.space.dim,
+                                            random_state=self._random_state)
         
     def probe(self, params, lazy=True):
         """Probe target of x"""
