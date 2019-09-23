@@ -47,6 +47,28 @@ def cnn2_defaults(config):
 
 
 def nn_defaults(config):
+    config['training_params'] = {'val_split': 0.2,
+                                 'dataset_dir': '../test_data/test_yc/1/',
+                                 'early_stopping': True,
+                                 'patience': 4,
+                                 'epochs': 1,
+                                 'out_dir': '../test_data/test_yc',
+                                 'run_name': 'test',
+                                 'batch_size': 8,
+                                 'data_shape': (10,),
+                                 'data_fmt': 'npy',
+                                 'verbose': True,
+                                 'use_generator': False
+                                 }
+    config['variable_space'] = {'dense_0': [200, 10, 10],
+                                'dense_1': [100, 5, 5],
+                                'dense_2': [50, 2, 2],
+                                'dense_dropout': [0.0, 0.8, 0.001],
+                                'log_lr': [0.0, 0.9, 0.01]
+                                }
+    config['fixed_space'] = {'log_beta_1': -1,
+                             'log_beta_2': -3,
+                             'dense_units': 3}
     return config
 
 
@@ -80,8 +102,8 @@ def default_config(architecture=None):
               'multiprocessing': 1,
               'previous_points': False,
               'feature_scaling': False,
-              'regression': False,
-              'classification': True,
+              'regression': True,
+              'classification': False,
               'variable_space': {
               },
               'fixed_space': {
@@ -98,6 +120,7 @@ def default_config(architecture=None):
     elif architecture == 'cnn2':
         cnn2_defaults(config)
     elif architecture[0:2] == 'nn':
+        config['architecture'] = architecture
         nn_defaults(config)
     elif architecture == 'rf':
         rf_defaults(config)

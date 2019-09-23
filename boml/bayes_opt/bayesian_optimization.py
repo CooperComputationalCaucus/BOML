@@ -11,7 +11,7 @@ from sklearn.gaussian_process.kernels import Matern
 from sklearn.gaussian_process import GaussianProcessRegressor
 
 
-class Queue:
+class Queue(object):
     def __init__(self):
         self._queue = []
 
@@ -65,7 +65,8 @@ class Observable(object):
 
 
 class BayesianOptimization(Observable):
-    def __init__(self, f, pbounds, random_state=None, verbose=2, constraints=[], init_points=1):
+    def __init__(self, f, pbounds, random_state=None, verbose=2, constraints=[],
+                 init_points=1):
         """"""
         self._random_state = ensure_rng(random_state)
 
@@ -75,7 +76,7 @@ class BayesianOptimization(Observable):
 
         # queue
         self._queue = Queue()
-        self.init_points=init_points
+        self.init_points = init_points
         # Internal GP regressor
         self._gp = GaussianProcessRegressor(
             kernel=Matern(nu=2.5),
@@ -107,7 +108,7 @@ class BayesianOptimization(Observable):
     @property
     def constraints(self):
         return self._array_constraints
-    
+
     def register(self, params, target):
         """Expect observation with known target"""
         self._space.register(params, target)
@@ -115,7 +116,7 @@ class BayesianOptimization(Observable):
 
     def probe(self, params, lazy=True):
         """Probe target of x"""
-        if isinstance(params,list):
+        if isinstance(params, list):
             for param in params:
                 if lazy:
                     self._queue.add(param)
@@ -130,7 +131,7 @@ class BayesianOptimization(Observable):
                 self.dispatch(Events.OPTMIZATION_STEP)
 
     def suggest(self, utility_function):
-        """Most promissing point to probe next"""
+        """Most promising point to probe next"""
         if len(self._space) < self.init_points:
             return self._space.array_to_params(self._space.random_sample())
 
@@ -173,7 +174,7 @@ class BayesianOptimization(Observable):
                  kappa=2.576,
                  xi=0.0,
                  **gp_params):
-        """Mazimize your function"""
+        """Maximize your function"""
         self._prime_subscriptions()
         self.dispatch(Events.OPTMIZATION_START)
         self._prime_queue(init_points)
@@ -205,61 +206,67 @@ class BayesianOptimization(Observable):
 
     def set_gp_params(self, **params):
         self._gp.set_params(**params)
-        
+
     def array_like_constraints(self):
-        '''
+        """
         Takes list of logical constraints in terms of space keys,
-        and replaces the constraints in terms of array indicies. 
+        and replaces the constraints in terms of array indicies.
         This allows direct evaluation in the acquisition function.
         Parameters
         ----------
         constraints: list of string constraints
-        '''
+        """
         keys = self.space.keys
         array_like = []
-        for constraint in self._key_constraints: 
+        for constraint in self._key_constraints:
             tmp = constraint
-            for idx,key in enumerate(keys):
-                #tmp = tmp.replace(key,'x[0][{}]'.format(idx))
-                tmp = tmp.replace(key,'x[{}]'.format(idx))
+            for idx, key in enumerate(keys):
+                # tmp = tmp.replace(key, 'x[0][{}]'.format(idx))
+                tmp = tmp.replace(key, 'x[{}]'.format(idx))
             array_like.append(tmp)
         return array_like
-    
+
     def get_constraint_dict(self):
-        '''
+        """
         Develops inequality constraints ONLY. (>=0)
-        '''
-        #TODO: write function to return scipy constraint dictionary for optimizer
-        #TODO: write options for equality constraints (incorporate in randomizer)
-        #TODO: write options for jacobian if needed?
+        """
+        # TODO: write function to return scipy constraint dictionary for optimizer
+        # TODO: write options for equality constraints (incorporate in randomizer)
+        # TODO: write options for jacobian if needed?
         dicts = []
-        funcs=[]
-        for idx,constraint in enumerate(self.constraints):
-            st = "def f_{}(x): return pd.eval({})\nfuncs.append(f_{})".format(idx,constraint,idx)
+        funcs = []
+        for idx, constraint in enumerate(self.constraints):
+            st = "def f_{}(x): return pd.eval({})\nfuncs.append(f_{})".format(
+                idx, constraint, idx)
             exec(st)
-            dicts.append({'type': 'ineq',
-                        'fun':funcs[idx]})
+            dicts.append({'type': 'ineq', 'fun': funcs[idx]})
         return dicts
-    
-    
+
+
 class DiscreteBayesianOptimization(BayesianOptimization):
-    '''
-    Optimization object by default performs batch optimization of discrete parameters. 
-    When using the open form optimizer (i.e. writing loops manually) the suggested parameters handled as lists of dicts. 
-    
-    '''
-    def __init__(self, f, prange, random_state=None, verbose=2,constraints=[], init_points=1, feature_scaling =False):
+    """
+    Optimization object by default performs batch optimization of discrete parameters.
+    When using the open form optimizer (i.e. writing loops manually) the suggested parameters handled as lists of dicts.
+
+    """
+
+    def __init__(self, f, prange, random_state=None, verbose=2, constraints=[],
+                 init_points=1, feature_scaling=False):
         """"""
-        
+
         # Data structure containing the function to be optimized, the bounds of
         # its domain, and a record of the evaluations we have done so far
-        self._pbounds = {item[0] :(item[1][:2]) for item in sorted(prange.items(), key=lambda x: x[0])}   
-        super(DiscreteBayesianOptimization, self).__init__(f,self._pbounds,random_state,verbose,constraints,init_points)
+        self._pbounds = {item[0]: (item[1][:2]) for item in
+                         sorted(prange.items(), key=lambda x: x[0])}
+        super(DiscreteBayesianOptimization, self).__init__(f, self._pbounds,
+                                                           random_state,
+                                                           verbose, constraints,
+                                                           init_points)
         self._space = DiscreteSpace(f, prange, random_state, feature_scaling)
-        
+
     def probe(self, params, lazy=True):
         """Probe target of x"""
-        if isinstance(params,list):
+        if isinstance(params, list):
             for param in params:
                 if lazy:
                     self._queue.add(param)
@@ -271,8 +278,8 @@ class DiscreteBayesianOptimization(BayesianOptimization):
                 self._queue.add(params)
             else:
                 self._space.probe(params)
-                self.dispatch(Events.OPTMIZATION_STEP)     
-    
+                self.dispatch(Events.OPTMIZATION_STEP)
+
     def _prime_subscriptions(self):
         if not any([len(subs) for subs in self._events.values()]):
             _logger = _get_default_logger(self._verbose)
@@ -280,13 +287,13 @@ class DiscreteBayesianOptimization(BayesianOptimization):
             self.subscribe(Events.OPTMIZATION_STEP, _logger)
             self.subscribe(Events.OPTMIZATION_END, _logger)
             self.subscribe(Events.BATCH_END, _logger)
-            
-    def suggest(self, utility_function,sampler='greedy',**kwargs):
+
+    def suggest(self, utility_function, sampler='greedy', **kwargs):
         """
-        Potential keywords 
+        Potential keywords
         ------------------
         n_acqs: Integer number of acquisitions to take from acquisition function ac.
-        n_warmup: number of times to randomly sample the aquisition function
+        n_warmup: number of times to randomly sample the acquisition function
         n_iter: number of times to run scipy.minimize
         multiprocessing: number of cores for multiprocessing of scipy.minimize
         n_slice: number of samples in slice sampling
@@ -296,17 +303,21 @@ class DiscreteBayesianOptimization(BayesianOptimization):
         list length n_acqs of dictionary style parameters 
         """
         if len(self._space) < self.init_points:
-            suggestions = [self.space._bin(self._space.random_sample(constraints=self.get_constraint_dict())) for _ in range(kwargs.get('n_acqs',2))]
-            if self._space.feature_scaling: suggestions = [self._space.reverse_scaling(suggestion) for suggestion in suggestions]
-            return self._space.array_to_params(suggestions)  
-        # Sklearn's GP throws a large number of warnings at times, but
+            suggestions = [self.space._bin(self._space.random_sample(
+                constraints=self.get_constraint_dict())) for _ in
+                range(kwargs.get('n_acqs', 2))]
+            if self._space.feature_scaling: suggestions = [
+                self._space.reverse_scaling(suggestion) for suggestion in
+                suggestions]
+            return self._space.array_to_params(suggestions)
+            # Sklearn's GP throws a large number of warnings at times, but
         # we don't really need to see them here.
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             self._gp.fit(self._space.params, self._space.target)
 
         # Finding argmax(s) of the acquisition function.
-        if sampler=='KMBBO':
+        if sampler == 'KMBBO':
             if self.constraints:
                 suggestion = disc_constrained_acq_KMBBO(
                     ac=utility_function.utility,
@@ -317,7 +328,7 @@ class DiscreteBayesianOptimization(BayesianOptimization):
                     ac=utility_function.utility,
                     instance=self,
                     **kwargs)
-        elif sampler=='greedy': 
+        elif sampler == 'greedy':
             if self.constraints:
                 suggestion = disc_constrained_acq_max(
                     ac=utility_function.utility,
@@ -339,6 +350,7 @@ class DiscreteBayesianOptimization(BayesianOptimization):
                     ac=utility_function.utility,
                     instance=self,
                     **kwargs)
-        if self._space.feature_scaling: suggestion = suggestion = [self._space.reverse_scaling(s) for s in suggestion]
-        
+        if self._space.feature_scaling: suggestion = suggestion = [
+            self._space.reverse_scaling(s) for s in suggestion]
+
         return self._space.array_to_params(suggestion)

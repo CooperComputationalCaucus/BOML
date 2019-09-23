@@ -12,8 +12,7 @@ import time
 import sys
 
 
-class Optimizer:
-
+class Optimizer(object):
     def __init__(self, config):
         self.start_time = time.time()
         self.config = config
@@ -49,7 +48,10 @@ class Optimizer:
             from boml.ml.keras_models.training import training
         elif self.config['architecture'] == 'cnn2':
             from boml.ml.keras_models.cnn import load_metaparameters, gen_hyperparameters
-            from boml.ml.keras_models.training import train
+            from boml.ml.keras_models.training import training
+        elif self.config['architecture'] == 'nn_yc':
+            from boml.ml.keras_models.nn_yc import load_metaparameters, gen_hyperparameters
+            from boml.ml.keras_models.training import training
         # elif self.config['architecture'][0:2] == 'nn':
         #     from .ml.nn.parameters import load_metaparameters, gen_hyperparameters
         #     from .ml.nn.models import training
@@ -90,7 +92,8 @@ class Optimizer:
             fnames = sorted(
                 glob.glob("{}/{}_*_metaparams".format(config['training_params']['out_dir'], config['basename'])))
             for fname in fnames:
-                with open(fname, 'rb') as f: points.append(pickle.load(f))  # 2-tuple of dictionary and scalar
+                with open(fname, 'rb') as f:
+                    points.append(pickle.load(f))  # 2-tuple of dictionary and scalar
             for point in points:
                 self.dbo.register(params=point[0], target=point[1])
             if config['debug_msgs']:
@@ -158,11 +161,11 @@ class Optimizer:
         print("Time taken: {} seconds for {} iterations".format(time.time() - self.start_time, self.iter_count))
 
 
-def optimize_nets(config_file=None, config_dict=None):
-    '''
-    Optimizer loop for loading configuration and running multiple architectures/hyperparameters 
-    in search for optimal score. 
-    '''
+def optimize_nets(config_file=False, config_dict=None, architecture=None):
+    """
+    Optimizer loop for loading configuration and running multiple architectures/hyperparameters
+    in search for optimal score.
+    """
 
     if config_file:
         with open(config_file, 'r') as f:
@@ -173,7 +176,7 @@ def optimize_nets(config_file=None, config_dict=None):
             config = default_config()
         config.update(config_inp)
     else:
-        config = default_config()
+        config = default_config(architecture)
     if config_dict:
         config.update(config_dict)
     sanity_checks(config)

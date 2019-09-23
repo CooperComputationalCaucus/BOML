@@ -27,6 +27,8 @@ def gen_model(params):
         from .cnn.models import gen_model as gm
     elif params['architecture'] == 'cnn2':
         from .cnn2.models import gen_model as gm
+    elif params['architecture'] == 'nn_yc':
+        from .nn_yc.models import gen_model as gm
     else:
         from .cnn.models import gen_model as gm
     return gm(params)
@@ -75,8 +77,8 @@ def general_training(params):
         val_generator = CategoricalDataGenerator(list_IDs=addrs['val_addrs'],
                                                  labels=addrs['val_labels'],
                                                  **gen_params)
-        steps_per_epoch = max(1,len(train_generator))
-        val_steps = max(1,len(val_generator))
+        steps_per_epoch = max(1, len(train_generator))
+        val_steps = max(1, len(val_generator))
     else:
         if params['classification']:
             gen_params = {'dim': params['data_shape'],

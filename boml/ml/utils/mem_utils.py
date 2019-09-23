@@ -9,8 +9,8 @@ import tensorflow as tf
 import numpy as np
 import gc
 
-GPU_RAM_LIMIT = 11
-CPU_RAM_LIMIT = 32
+GPU_RAM_LIMIT = 8
+CPU_RAM_LIMIT = 64
 
 
 def reset_keras(*args):

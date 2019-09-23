@@ -10,56 +10,64 @@ from .target_space import _hashable
 from sklearn.cluster import KMeans
 # TODO: write parallelization for several acquisition functions
 
-class LocalOptimizer():
-    ''' Class of helper functions for minimization (Class needs to be picklable)'''
-    def __init__(self,ac,gp,y_max,bounds,method="L-BFGS-B"):
+class LocalOptimizer(object):
+    """ Class of helper functions for minimization (Class needs to be picklable)"""
+    def __init__(self, ac, gp, y_max, bounds, method="L-BFGS-B"):
         self.ac = ac
         self.gp = gp
-        self.y_max=y_max
-        self.bounds=bounds
-        self.method=method
-    def func_max(self,x):
+        self.y_max = y_max
+        self.bounds = bounds
+        self.method = method
+
+    def func_max(self, x):
         return -self.ac(x.reshape(1, -1), gp=self.gp, y_max=self.y_max)
-    def func_min(self,x):
+
+    def func_min(self, x):
         return self.ac(x.reshape(1, -1), gp=self.gp, y_max=self.y_max)
-    def minimizer(self,x_try):
+
+    def minimizer(self, x_try):
         return minimize(self.func_min,
+                        x_try.reshape(1, -1),
+                        bounds=self.bounds,
+                        method="L-BFGS-B")
+
+    def maximizer(self, x_try):
+        res = minimize(self.func_max,
                        x_try.reshape(1, -1),
                        bounds=self.bounds,
                        method="L-BFGS-B")
-    def maximizer(self,x_try):
-        res= minimize(self.func_max,
-                       x_try.reshape(1, -1),
-                       bounds=self.bounds,
-                       method="L-BFGS-B")
-        res.fun[0]=-1*res.fun[0]
+        res.fun[0] = -1*res.fun[0]
         return res
 
-class LocalConstrainedOptimizer():
-    ''' Class of helper functions for minimization (Class needs to be picklable)'''
-    def __init__(self,ac,gp,y_max,bounds,method="SLSQP",constraints=()):
+class LocalConstrainedOptimizer(object):
+    """ Class of helper functions for minimization (Class needs to be picklable)"""
+    def __init__(self, ac, gp, y_max, bounds, method="SLSQP", constraints=()):
         self.ac = ac
         self.gp = gp
-        self.y_max=y_max
-        self.bounds=bounds
-        self.method=method
-        self.constraints=constraints
-    def func_max(self,x):
+        self.y_max = y_max
+        self.bounds = bounds
+        self.method = method
+        self.constraints = constraints
+
+    def func_max(self, x):
         return -self.ac(x.reshape(1, -1), gp=self.gp, y_max=self.y_max)
-    def func_min(self,x):
+
+    def func_min(self, x):
         return self.ac(x.reshape(1, -1), gp=self.gp, y_max=self.y_max)
-    def minimizer(self,x_try):
+
+    def minimizer(self, x_try):
         return minimize(self.func_min,
                        x_try.reshape(1, -1),
                        bounds=self.bounds,
                        method="L-BFGS-B")
-    def maximizer(self,x_try):
-        res= minimize(self.func_max,
+
+    def maximizer(self, x_try):
+        res = minimize(self.func_max,
                        x_try.reshape(1, -1),
                        bounds=self.bounds,
                        method=self.method,
                        constraints=self.constraints)
-        res.fun=[-1*res.fun]
+        res.fun = [-1*res.fun]
         return res    
 
 def disc_acq_max(ac, instance, n_acqs=1, n_warmup=100000, n_iter=250, multiprocessing=1):
@@ -101,16 +109,17 @@ def disc_acq_max(ac, instance, n_acqs=1, n_warmup=100000, n_iter=250, multiproce
     ys = ac(x_tries, gp=gp, y_max=y_max)
     
     # Using a dictionary to update top n_acqs,and retains the threshold for the bottom
-    x_tries=x_tries[ys.argsort()[::-1]]
-    ys= ys[ys.argsort()[::-1]]
+    x_tries = x_tries[ys.argsort()[::-1]]
+    ys = ys[ys.argsort()[::-1]]
     acqs = {}
     for idx in range(x_tries.shape[0]):
-        if _hashable(x_tries[idx,:]) in instance.space:
+        if _hashable(x_tries[idx, :]) in instance.space:
             continue
         else:
-            acqs[_hashable(x_tries[idx,:])]=ys[idx]
-        if len(acqs)>n_acqs: break
-    acq_threshold = sorted(acqs.items(), key=lambda t: (t[1],t[0]))[0]
+            acqs[_hashable(x_tries[idx, :])] = ys[idx]
+        if len(acqs) > n_acqs:
+            break
+    acq_threshold = sorted(acqs.items(), key=lambda t: (t[1], t[0]))[0]
    
     # Explore the parameter space more throughly
     x_seeds = random_state.uniform(bounds[:, 0], bounds[:, 1],
@@ -119,7 +128,7 @@ def disc_acq_max(ac, instance, n_acqs=1, n_warmup=100000, n_iter=250, multiproce
     if multiprocessing>1:
         # Memory unconscious multiprocessing makes list of n_iter results...
         pool = Pool(multiprocessing)
-        results = list(pool.imap_unordered(lo.maximizer,x_seeds))
+        results = list(pool.imap_unordered(lo.maximizer, x_seeds))
         pool.close()
         pool.join()
         for res in results:
@@ -127,9 +136,11 @@ def disc_acq_max(ac, instance, n_acqs=1, n_warmup=100000, n_iter=250, multiproce
                 if _hashable(instance.space._bin(res.x)) in instance.space:
                     continue
                 acqs[_hashable(instance.space._bin(res.x))] = res.fun[0]
-                if len(acqs)>n_acqs:
+                if len(acqs) > n_acqs:
                     del acqs[acq_threshold[0]]
-                    acq_threshold = sorted(acqs.items(), key=lambda t: (t[1],t[0]))[0]
+                    acq_threshold = sorted(
+                        acqs.items(), key=lambda t: (t[1], t[0])
+                    )[0]
     else:
         for x_try in x_seeds:
             # Maximize the acquisition function
@@ -144,7 +155,7 @@ def disc_acq_max(ac, instance, n_acqs=1, n_warmup=100000, n_iter=250, multiproce
                 if _hashable(instance.space._bin(res.x)) in instance.space:
                     continue
                 acqs[_hashable(instance.space._bin(res.x))] = res.fun[0]
-                if len(acqs)>n_acqs:
+                if len(acqs) > n_acqs:
                     del acqs[acq_threshold[0]]
                     acq_threshold = sorted(acqs.items(), key=lambda t: (t[1],t[0]))[0]
 
@@ -171,8 +182,8 @@ def disc_acq_KMBBO(ac, instance, n_acqs=1, n_slice=200, n_warmup=100000, n_iter=
     -------
     List of the sampled means of the acquisition function.
     """
-    assert n_slice>=n_acqs, "number of points in slice (n_slice) must be greater \
-                             than number of centroids in k-means (n_acqs)"
+    assert n_slice >= n_acqs, "number of points in slice (n_slice) must be " \
+                              "greater than number of centroids in k-means (n_acqs)"
     
     # Inialization from instance
     gp = instance._gp
@@ -194,7 +205,7 @@ def disc_acq_KMBBO(ac, instance, n_acqs=1, n_slice=200, n_warmup=100000, n_iter=
     # Explore the parameter space more throughly
     x_seeds = random_state.uniform(bounds[:, 0], bounds[:, 1],
                                    size=(n_iter, bounds.shape[0]))
-    if multiprocessing>1:
+    if multiprocessing > 1:
         # Memory unconscious multiprocessing makes list of n_iter results...
         pool = Pool(multiprocessing)
         results = list(pool.imap_unordered(lo.minimizer,x_seeds))
@@ -208,7 +219,8 @@ def disc_acq_KMBBO(ac, instance, n_acqs=1, n_slice=200, n_warmup=100000, n_iter=
                 continue
             if a_min is None or res.fun[0] <= a_min:
                 a_min = res.fun[0]
-    if a_min>0: a_min = 0 # The algorithm will fail the minimum found is greater than 0
+    if a_min > 0:
+        a_min = 0 # The algorithm will fail the minimum found is greater than 0
 
     # Initial sample over space
     s = random_state.uniform(bounds[:, 0], bounds[:, 1],size=(1, bounds.shape[0]))
@@ -222,13 +234,13 @@ def disc_acq_KMBBO(ac, instance, n_acqs=1, n_slice=200, n_warmup=100000, n_iter=
                 break
     # Find centroids
 
-    kmeans = KMeans(n_clusters = n_acqs,
-                    random_state = random_state,
-                    n_jobs = multiprocessing).fit(slice)
+    kmeans = KMeans(n_clusters=n_acqs,
+                    random_state=random_state,
+                    n_jobs=multiprocessing).fit(slice)
     # Make hashable and assert length
     acqs = {}
     for i in range(n_acqs):
-        acqs[_hashable(instance.space._bin(kmeans.cluster_centers_[i,:]))] = i
+        acqs[_hashable(instance.space._bin(kmeans.cluster_centers_[i, :]))] = i
     assert len(acqs) == n_acqs, "k-means clustering is not distinct in discretized space!" 
     
     return [key for key in acqs.keys()]                         
@@ -262,41 +274,44 @@ def disc_constrained_acq_max(ac, instance, n_acqs=1, n_warmup=100000, n_iter=250
     random_state = instance._random_state
     
     # Class of helper functions for minimization (Class needs to be picklable)
-    lo = LocalConstrainedOptimizer(ac,gp,y_max,bounds,constraints=instance.get_constraint_dict())
+    lo = LocalConstrainedOptimizer(ac, gp, y_max, bounds, constraints=instance.get_constraint_dict())
 
     # Warm up with random points
     x_tries = np.floor((random_state.uniform(bounds[:, 0], bounds[:, 1], 
-                                             size=(n_warmup, bounds.shape[0]))-bounds[:,0])/
-                                             steps)*steps+bounds[:,0]
+                                             size=(n_warmup, bounds.shape[0]))-bounds[:, 0])/
+                                             steps)*steps+bounds[:, 0]
     # Apply constraints
     for dict in instance.get_constraint_dict():
-        mask =np.ones((x_tries.shape[0],),dtype=bool)
-        for i,x in enumerate(x_tries[:]):
-            if dict['fun'](x)<0: mask[i]=False
-        x_tries=x_tries[mask,:]
+        mask = np.ones((x_tries.shape[0],), dtype=bool)
+        for i, x in enumerate(x_tries[:]):
+            if dict['fun'](x) < 0:
+                mask[i] = False
+        x_tries = x_tries[mask, :]
     ys = ac(x_tries, gp=gp, y_max=y_max)
     
     # Using a dictionary to update top n_acqs,and retains the threshold for the bottom
-    x_tries=x_tries[ys.argsort()[::-1]]
-    ys= ys[ys.argsort()[::-1]]
+    x_tries = x_tries[ys.argsort()[::-1]]
+    ys = ys[ys.argsort()[::-1]]
     acqs = {}
     for idx in range(x_tries.shape[0]):
-        if _hashable(x_tries[idx,:]) in instance.space:
+        if _hashable(x_tries[idx, :]) in instance.space:
             continue
         else:
-            acqs[_hashable(x_tries[idx,:])]=ys[idx]
-        if len(acqs)>n_acqs: break
-    acq_threshold = sorted(acqs.items(), key=lambda t: (t[1],t[0]))[0]
+            acqs[_hashable(x_tries[idx, :])] = ys[idx]
+        if len(acqs) > n_acqs:
+            break
+    acq_threshold = sorted(acqs.items(), key=lambda t: (t[1], t[0]))[0]
    
     # Explore the parameter space more throughly
     x_seeds = random_state.uniform(bounds[:, 0], bounds[:, 1],
                                    size=(n_iter, bounds.shape[0]))
     # Ensure seeds satisfy initial constraints
     for dict in instance.get_constraint_dict():
-        mask = np.ones((x_seeds.shape[0],),dtype=bool)
-        for i,x in enumerate(x_seeds[:]):
-            if dict['fun'](x)<0: mask[i]=False
-        x_seeds=x_seeds[mask,:]
+        mask = np.ones((x_seeds.shape[0],), dtype=bool)
+        for i, x in enumerate(x_seeds[:]):
+            if dict['fun'](x) < 0:
+                mask[i] = False
+        x_seeds = x_seeds[mask, :]
         
     for x_try in x_seeds:
         # Maximize the acquisition function
@@ -311,9 +326,9 @@ def disc_constrained_acq_max(ac, instance, n_acqs=1, n_warmup=100000, n_iter=250
             if _hashable(instance.space._bin(res.x)) in instance.space:
                 continue
             acqs[_hashable(instance.space._bin(res.x))] = res.fun[0]
-            if len(acqs)>n_acqs:
+            if len(acqs) > n_acqs:
                 del acqs[acq_threshold[0]]
-                acq_threshold = sorted(acqs.items(), key=lambda t: (t[1],t[0]))[0]
+                acq_threshold = sorted(acqs.items(), key=lambda t: (t[1], t[0]))[0]
     return [key for key in acqs.keys()]
     
 def disc_constrained_acq_KMBBO(ac, instance, n_acqs=1, n_slice=200, n_warmup=100000, n_iter=250, multiprocessing=1):
@@ -337,7 +352,7 @@ def disc_constrained_acq_KMBBO(ac, instance, n_acqs=1, n_slice=200, n_warmup=100
     -------
     List of the sampled means of the acquisition function.
     """
-    assert n_slice>=n_acqs, "number of points in slice (n_slice) must be greater \
+    assert n_slice >= n_acqs, "number of points in slice (n_slice) must be greater \
                              than number of centroids in k-means (n_acqs)"
     
     # Inialization from instance
@@ -346,10 +361,10 @@ def disc_constrained_acq_KMBBO(ac, instance, n_acqs=1, n_slice=200, n_warmup=100
     bounds = instance._space.bounds
     steps = instance._space.steps
     random_state = instance._random_state                         
-    slice = np.zeros((n_slice,bounds.shape[0]))
+    slice = np.zeros((n_slice, bounds.shape[0]))
     constraint_dict = instance.get_constraint_dict()
     # Uses LBGFS for minding min (could be outside of constraints)
-    lo = LocalOptimizer(ac,gp,y_max,bounds)
+    lo = LocalOptimizer(ac, gp, y_max, bounds)
     
     # First finding minimum of acquisition function
     # Warm up with random points
@@ -360,10 +375,10 @@ def disc_constrained_acq_KMBBO(ac, instance, n_acqs=1, n_slice=200, n_warmup=100
     # Explore the parameter space more throughly
     x_seeds = random_state.uniform(bounds[:, 0], bounds[:, 1],
                                    size=(n_iter, bounds.shape[0]))
-    if multiprocessing>1:
+    if multiprocessing > 1:
         # Memory unconscious multiprocessing makes list of n_iter results...
         pool = Pool(multiprocessing)
-        results = list(pool.imap_unordered(lo.minimizer,x_seeds))
+        results = list(pool.imap_unordered(lo.minimizer, x_seeds))
         pool.close()
         pool.join()
         a_min = sorted(results, key=lambda x: x.fun[0])[0].fun[0]
@@ -374,38 +389,39 @@ def disc_constrained_acq_KMBBO(ac, instance, n_acqs=1, n_slice=200, n_warmup=100
                 continue
             if a_min is None or res.fun[0] <= a_min:
                 a_min = res.fun[0]
-    if a_min>0: a_min = 0 # The algorithm will fail the minimum found is greater than 0
+    if a_min > 0:
+        a_min = 0 # The algorithm will fail the minimum found is greater than 0
 
     
     # Initial sample over space
-    invalid=True
+    invalid = True
     while invalid:
-        s = random_state.uniform(bounds[:, 0], bounds[:, 1],size=(1, bounds.shape[0]))
-        invalid=False
+        s = random_state.uniform(bounds[:, 0], bounds[:, 1], size=(1, bounds.shape[0]))
+        invalid = False
         for dict in constraint_dict:
-            if dict['fun'](s.squeeze())<0: invalid=True   
+            if dict['fun'](s.squeeze()) < 0:
+                invalid = True
     # Slice aggregation
     for i in range(n_slice):
-        u = random_state.uniform(a_min,ac(s, gp=gp, y_max=y_max))  
+        u = random_state.uniform(a_min, ac(s, gp=gp, y_max=y_max))
         while True:
-            invalid=True
+            invalid = True
             while invalid:
-                s = random_state.uniform(bounds[:, 0], bounds[:, 1],size=(1, bounds.shape[0]))
-                invalid=False
+                s = random_state.uniform(bounds[:, 0], bounds[:, 1], size=(1, bounds.shape[0]))
+                invalid = False
                 for dict in constraint_dict:
-                    if dict['fun'](s.squeeze())<0: invalid=True 
+                    if dict['fun'](s.squeeze()) < 0:
+                        invalid = True
             if ac(s, gp=gp, y_max=y_max) > u:
                 slice[i] = s
                 break
     # Find centroids
-    kmeans = KMeans(n_clusters = n_acqs,
-                    random_state = random_state,
-                    n_jobs = multiprocessing).fit(slice)
+    kmeans = KMeans(n_clusters=n_acqs,
+                    random_state=random_state,
+                    n_jobs=multiprocessing).fit(slice)
     # Make hashable and assert length
     acqs = {}
     for i in range(n_acqs):
-        acqs[_hashable(instance.space._bin(kmeans.cluster_centers_[i,:]))] = i
+        acqs[_hashable(instance.space._bin(kmeans.cluster_centers_[i, :]))] = i
     assert len(acqs) == n_acqs, "k-means clustering is not distinct in discretized space!" 
     return [key for key in acqs.keys()]          
-    
-    
