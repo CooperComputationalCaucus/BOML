@@ -3,8 +3,7 @@ Bayesian optimized machine learning. Under continual development
 with addition of new models and architectures. 
 
 Until further publication, please cite:
-Maffettone P.M., Cooper, A.I.  
-Deep learning from crystallographic representations of periodic systems. 
+Maffettone P.M., Cooper, A.I. Deep learning from crystallographic representations of periodic systems. 
 In: Fall 2019 ACS National Meeting; 2019 Aug 25--29; San Diego; ACS; 2019. No CINF 84. 
 
 Abstract [here](https://tpa.acs.org/abstract/acsnm258-3206522/deep-learning-from-crystallographic-representations-of-periodic-systems).
