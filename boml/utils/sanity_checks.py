@@ -3,6 +3,7 @@
 Set of checks for configurations to catch obvious issues before they arise.
 """
 import warnings
+import os
 
 
 def custom_formatwarning(message, category, filename, lineno, *args, **kwargs):
@@ -13,12 +14,15 @@ warnings.formatwarning = custom_formatwarning
 
 
 def general_checks(config):
-    if config['init_random'] == 0 & config['previous_points']:
+    if config['init_random'] == 0 and (not config['previous_points']):
         raise RuntimeError("A model without previous points requires random initialization.\n"
                            "Please check 'init_random' and 'previous_points' in your configuration file.")
 
-    if config['regression'] & config['classification']:
-        raise RuntimeError("Cannot simultaneously do regression and classification. Check configuration!")
+    if config['regression']:
+        if config['classification']:
+            raise RuntimeError("Cannot simultaneously do regression and classification. Check configuration!")
+        if 'regression_path' not in config['training_params'] or not os.path.exists(config['training_params']['regression_path']):
+            raise RuntimeError("No regression path or nonexistent regression path given.")
 
 
 def sklearn_checks(config):
