@@ -27,12 +27,12 @@ def reset_keras(*args):
     gc.collect()
 
 def config_keras():
-    config = tf.compat.v1.ConfigProto()
+    config = tf.ConfigProto()
     config.gpu_options.allow_growth = True  # dynamically grow the memory used on the GPU
-    #config.gpu_options.per_process_gpu_memory_fraction = 0.8 #Use fixed fraction of GPU memory
-    sess = tf.compat.v1.Session(config=config)
-    set_session(sess)  
-    
+    config.gpu_options.per_process_gpu_memory_fraction = 0.5 #Use fixed fraction of GPU memory
+    sess = tf.Session(config=config)
+    set_session(sess)
+
 
 def check_model_memory(model,batch_size):
     '''
@@ -89,10 +89,10 @@ def check_dataset_memory(m,data_shape,batch_size=1,use_generator=False):
     from functools import reduce
     cpu_ram = CPU_RAM_LIMIT
     if use_generator:
-        mem_req_data = 4*2*reduce(lambda x,y: x*y, data_shape)*batch_size/10**9  
+        mem_req_data = 4*2*reduce(lambda x,y: x*y, data_shape)*batch_size/10**9
     else:
-        mem_req_data = 4*2*reduce(lambda x,y: x*y, data_shape)*m/10**9   
+        mem_req_data = 4*2*reduce(lambda x,y: x*y, data_shape)*m/10**9
     if(0.8*cpu_ram<mem_req_data):
-        print(mem_req_data,'GB required') 
+        print(mem_req_data,'GB required')
         raise ValueError("The amount of memory required to load the dataset exceeds 80% the available "\
                          "RAM. Please reduce the oversampling, or use a generator based training")
