@@ -16,7 +16,8 @@ def _default_hyperparameters():
         'cv': 5,
         'n_jobs': 0,
         'cv_threads': 1,
-        'architecture': 'svm',
+        'architecture': 'gp',
+        'kernel': 'default',
 
         # Variable training parameters for each model type
         'length_scale': 1,
