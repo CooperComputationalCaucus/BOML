@@ -220,6 +220,7 @@ def load_regression_data(list_IDs, dataset_path, regression_target = 'default',d
         df = pd.read_pickle(dataset_path)
     elif os.path.splitext(dataset_path)[1] =='.csv':
         df = pd.read_csv(dataset_path)
+        df['Name'] = df['Name'].map(str)
         df.set_index('Name', inplace=True)
     df = df[~df.index.duplicated(keep='first')]
     

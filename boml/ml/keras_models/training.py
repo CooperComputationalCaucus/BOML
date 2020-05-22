@@ -6,7 +6,7 @@ local packages
 """
 from keras import optimizers
 from keras.callbacks import EarlyStopping
-from tensorflow.compat.v1 import set_random_seed
+from tensorflow import set_random_seed
 
 import numpy as np
 import time

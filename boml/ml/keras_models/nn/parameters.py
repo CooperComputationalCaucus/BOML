@@ -87,7 +87,7 @@ def gen_hyperparameters(metaparams):
     # Create list of nodes per layer from metaparams
     params = {}
     if metaparams['architecture'] == 'nn_general' or metaparams['architecture'] == 'nn':
-        params['dense_dims'] = [metaparams['nodes']]
+        params['dense_dims'] = [int(metaparams['nodes'])]
         for _ in range(metaparams['dense_units'] - 1):
             params['dense_dims'].append(int(params['dense_dims'][-1] * (2 ** metaparams['nodes_roc'])))
     else:

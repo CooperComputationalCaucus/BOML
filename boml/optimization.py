@@ -62,6 +62,9 @@ class Optimizer:
         elif self.config['architecture'] == 'rf':
             from boml.ml.sklearn_models.rf import load_metaparameters, gen_hyperparameters
             from boml.ml.sklearn_models.training import training
+        elif self.config['architecture'] == 'gb':
+            from boml.ml.sklearn_models.gb import load_metaparameters, gen_hyperparameters
+            from boml.ml.sklearn_models.training import training
         elif self.config['architecture'] == 'gp':
             from boml.ml.sklearn_models.gp import load_metaparameters, gen_hyperparameters
             from boml.ml.sklearn_models.training import training
@@ -88,7 +91,7 @@ class Optimizer:
                 sys.stdout.flush()
             points = []
             fnames = sorted(
-                glob.glob("{}/{}_*_metaparams".format(config['training_params']['out_dir'], config['basename'])))
+                glob.glob("{}/{}_*_metaparams.pickle".format(config['training_params']['out_dir'], config['basename'])))
             for fname in fnames:
                 with open(fname, 'rb') as f: points.append(pickle.load(f))  # 2-tuple of dictionary and scalar
             for point in points:

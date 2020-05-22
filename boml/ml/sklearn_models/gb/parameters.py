@@ -1,7 +1,7 @@
 """
 @author: maffettone
 
-Parameters set up for gaussian processes
+Parameters setup for gradient boosting.
 """
 
 
@@ -14,14 +14,15 @@ def _default_hyperparameters():
         'out_dir': '../test_data',
         'run_name': 'test',
         'cv': 5,
-        'n_jobs': 0,
+        'n_jobs': 1,
         'cv_threads': 1,
-        'architecture': 'gp',
-        'kernel': 'default',
+        'architecture': 'gb',
 
         # Variable training parameters for each model type
-        'length_scale': 1,
-        'nu': 2.5,
+        'learning_rate': 0.1,  # learning rate shrinks the contribution of each tree by learning_rate
+        'n_estimators': 10,  # The number of trees in the forest.
+        'min_samples_split': 2,  # The minimum number of samples required to be at a leaf node.
+        'max_features': 0,  # The fractional number of features to consider when looking for the best split. 0 -> sqrt
 
         # Fixed model parameters
         'n_classes': 16,
@@ -39,8 +40,12 @@ def load_metaparameters(param_dict=None):
     """
     Parameters for bayesian optimizer. Default dictionary listed and updated by param_dict.
     """
-    metaparams = {'log_length_scale': 0,
-                  'nu': 2.5}
+    metaparams = {'architecture': 'gb',
+                  'multiprocessing': 0,
+                  'log_learning_rate': -1.,
+                  'log_n_estimators': 1,
+                  'min_samples_split': 2,
+                  'max_features': 0}
     if param_dict:
         metaparams.update(param_dict)
 
@@ -56,7 +61,8 @@ def gen_hyperparameters(metaparams):
     """
 
     hyperparams = _default_hyperparameters()
-    hyperparams['length_scale'] = 10 ** metaparams['log_length_scale']
+    hyperparams['learning_rate'] = 10 ** metaparams['log_learning_rate']
+    hyperparams['n_estimators'] = 10 ** metaparams['log_n_estimators']
 
     # Update single values like cross val, directories, etc
     for key in metaparams:
@@ -64,9 +70,11 @@ def gen_hyperparameters(metaparams):
             hyperparams[key] = metaparams[key]
 
     # Ensure types
-    hyperparams['cv'] = int( hyperparams['cv'])
-    if hyperparams['nu'] not in [0.5, 1.5, 2.5, float('inf')]:
-        hyperparams['nu'] = float('inf')
+    hyperparams['cv'] = int(hyperparams['cv'])
+    hyperparams['n_estimators'] = int(hyperparams['n_estimators'])
+    hyperparams['min_samples_split'] = int(hyperparams['min_samples_split'])
+    if hyperparams['max_features'] <= 0:
+        hyperparams['max_features'] = 'sqrt'
 
     # Multiprocessing for sklearn
     if metaparams['multiprocessing']:
