@@ -51,3 +51,4 @@ Thumbs.db
 test_data/*
 !test_data/organic_rgb/
 *.pdf
+config/*
